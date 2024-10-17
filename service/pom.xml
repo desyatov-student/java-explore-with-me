@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>ru.practicum</groupId>
-        <artifactId>ewm-stats</artifactId>
+        <artifactId>explore-with-me</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
-    <groupId>ru.practicum.ewm.stats</groupId>
-    <artifactId>stats-server</artifactId>
+    <groupId>ru.practicum.ewm</groupId>
+    <artifactId>ewm-service</artifactId>
 
     <build>
         <plugins>
@@ -25,4 +25,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>
