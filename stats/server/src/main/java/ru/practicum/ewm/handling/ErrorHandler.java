@@ -1,9 +1,9 @@
-package handling;
+package ru.practicum.ewm.handling;
 
-import exception.ConditionsNotMetException;
-import exception.DuplicatedDataException;
-import exception.NotFoundException;
-import exception.ValidationException;
+import ru.practicum.ewm.exception.ConditionsNotMetException;
+import ru.practicum.ewm.exception.DuplicatedDataException;
+import ru.practicum.ewm.exception.NotFoundException;
+import ru.practicum.ewm.exception.ValidationException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;

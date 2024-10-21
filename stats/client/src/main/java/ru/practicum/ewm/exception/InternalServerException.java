@@ -1,4 +1,4 @@
-package exception;
+package ru.practicum.ewm.exception;
 
 public class InternalServerException extends RuntimeException {
     public InternalServerException(String message) {

@@ -11,6 +11,7 @@ import ru.practicum.ewm.mapper.EndpointHitMapper;
 import ru.practicum.ewm.model.EndpointHit;
 import ru.practicum.ewm.model.ViewStats;
 import ru.practicum.ewm.repository.HitRepository;
+import ru.practicum.ewm.utils.DateMapper;
 
 import java.util.List;
 import java.util.function.Function;
@@ -26,6 +27,7 @@ public class StatsService {
     @Transactional
     public EndpointHitDto create(NewEndpointHitRequestDto request) {
         EndpointHit hit = endpointHitMapper.toHit(request);
+        hit.setTimestamp(DateMapper.now());
         hit = hitRepository.save(hit);
         return endpointHitMapper.toDto(hit);
     }

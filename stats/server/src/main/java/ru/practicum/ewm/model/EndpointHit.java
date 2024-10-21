@@ -21,5 +21,5 @@ public class EndpointHit {
     private String app;
     private String uri;
     private String ip;
-    private Instant timestamp = Instant.now();
+    private Instant timestamp;
 }

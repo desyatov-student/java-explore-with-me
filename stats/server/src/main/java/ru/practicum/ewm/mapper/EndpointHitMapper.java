@@ -7,10 +7,11 @@ import ru.practicum.ewm.dto.NewEndpointHitRequestDto;
 import ru.practicum.ewm.dto.ViewStatsDto;
 import ru.practicum.ewm.model.EndpointHit;
 import ru.practicum.ewm.model.ViewStats;
+import ru.practicum.ewm.utils.DateMapper;
 
 import static org.mapstruct.MappingConstants.ComponentModel.SPRING;
 
-@Mapper(componentModel = SPRING)
+@Mapper(componentModel = SPRING, uses = { DateMapper.class })
 public interface EndpointHitMapper {
 
     EndpointHitDto toDto(EndpointHit hit);

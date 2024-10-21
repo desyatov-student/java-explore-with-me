@@ -12,6 +12,20 @@
     <groupId>ru.practicum.ewm</groupId>
     <artifactId>ewm-service</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>ru.practicum.ewm.stats</groupId>
+            <artifactId>stats-client</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.httpcomponents.client5</groupId>
+            <artifactId>httpclient5</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

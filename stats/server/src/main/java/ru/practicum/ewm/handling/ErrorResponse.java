@@ -1,4 +1,4 @@
-package handling;
+package ru.practicum.ewm.handling;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

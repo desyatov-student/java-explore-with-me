@@ -7,12 +7,15 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.TimeZone;
 
 @Component
 public class DateMapper {
 
-    private static final ZoneId ZONE = ZoneId.systemDefault();
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    private static final String PATTERN = "yyyy-MM-dd HH:mm:ss";
+
+    private static final ZoneId ZONE = TimeZone.getTimeZone("UTC").toZoneId();
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(PATTERN)
             .withZone(ZONE);
 
     public String toString(Instant date) {
