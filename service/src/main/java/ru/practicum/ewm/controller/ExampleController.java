@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.dto.GetStatsRequest;
 import ru.practicum.ewm.dto.ViewStatsDto;
-import ru.practicum.ewm.hit.HitClient;
+import ru.practicum.ewm.client.StatsClient;
 import ru.practicum.ewm.utils.DateMapper;
 
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ExampleController {
 
-    private final HitClient hitClient;
+    private final StatsClient hitClient;
     private final DateMapper dateMapper;
 
     @GetMapping("stats")
