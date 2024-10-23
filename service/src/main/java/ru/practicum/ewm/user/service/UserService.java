@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.practicum.ewm.exception.DuplicatedDataException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.user.dto.GetUsersRequest;
-import ru.practicum.ewm.user.dto.NewUserRequest;
+import ru.practicum.ewm.user.dto.NewUserDto;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.mapper.UserMapper;
 import ru.practicum.ewm.user.model.User;
@@ -51,7 +51,7 @@ public class UserService {
                 });
     }
 
-    public UserDto create(NewUserRequest request) {
+    public UserDto create(NewUserDto request) {
         Optional<User> alreadyExistUser = userRepository.findByEmail(request.getEmail());
         if (alreadyExistUser.isPresent()) {
             log.error("Creating user is failed. email = {} exists", request.getEmail());

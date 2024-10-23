@@ -4,10 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
+import ru.practicum.ewm.category.dto.UpdateCategoryDto;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
-import ru.practicum.ewm.category.dto.NewCategoryRequest;
+import ru.practicum.ewm.category.dto.NewCategoryDto;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.exception.DuplicatedDataException;
@@ -44,7 +44,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto create(NewCategoryRequest request) {
+    public CategoryDto create(NewCategoryDto request) {
         Optional<Category> alreadyExistCategory = categoryRepository.findByName(request.getName());
         if (alreadyExistCategory.isPresent()) {
             throwDuplicatedDataException(request.getName());
@@ -63,7 +63,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto update(Long categoryId, UpdateCategoryRequest request) {
+    public CategoryDto update(Long categoryId, UpdateCategoryDto request) {
         Category category = getCategoryById(categoryId);
         if (category.getName().equals(request.getName())) {
             throwDuplicatedDataException(request.getName());

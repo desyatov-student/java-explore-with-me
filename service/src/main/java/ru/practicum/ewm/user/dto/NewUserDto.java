@@ -7,7 +7,7 @@ import ru.practicum.ewm.validation.ValidEmailAndNotBlank;
 
 @Data
 @AllArgsConstructor
-public class NewUserRequest {
+public class NewUserDto {
     @ValidEmailAndNotBlank
     private String email;
     @NotBlank

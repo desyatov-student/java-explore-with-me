@@ -14,11 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.category.dto.CategoryDto;
-import ru.practicum.ewm.category.dto.NewCategoryRequest;
-import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
+import ru.practicum.ewm.category.dto.NewCategoryDto;
+import ru.practicum.ewm.category.dto.UpdateCategoryDto;
 import ru.practicum.ewm.category.service.CategoryService;
 import ru.practicum.ewm.user.dto.GetUsersRequest;
-import ru.practicum.ewm.user.dto.NewUserRequest;
+import ru.practicum.ewm.user.dto.NewUserDto;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.service.UserService;
 
@@ -44,7 +44,7 @@ public class AdminController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserDto create(@Valid @RequestBody NewUserRequest request) {
+    public UserDto create(@Valid @RequestBody NewUserDto request) {
         return userService.create(request);
     }
 
@@ -56,7 +56,7 @@ public class AdminController {
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto create(@Valid @RequestBody NewCategoryRequest request) {
+    public CategoryDto create(@Valid @RequestBody NewCategoryDto request) {
         return categoryService.create(request);
     }
 
@@ -69,7 +69,7 @@ public class AdminController {
     @PatchMapping("/categories/{catId}")
     public CategoryDto update(
             @PathVariable Long catId,
-            @Valid @RequestBody UpdateCategoryRequest request
+            @Valid @RequestBody UpdateCategoryDto request
     ) {
         return categoryService.update(catId, request);
     }
