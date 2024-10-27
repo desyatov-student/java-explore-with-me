@@ -6,7 +6,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
-import ru.practicum.ewm.category.dto.UpdateCategoryDto;
+import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.dto.CategoryDto;
 
@@ -22,5 +22,5 @@ public interface CategoryMapper {
 
     @Mapping(target = "id", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Category updateModel(@MappingTarget Category category, UpdateCategoryDto request);
+    Category updateModel(@MappingTarget Category category, UpdateCategoryRequest request);
 }

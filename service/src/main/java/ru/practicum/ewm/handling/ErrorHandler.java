@@ -4,6 +4,7 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingRequestHeaderException;
@@ -15,6 +16,10 @@ import ru.practicum.ewm.exception.ConditionsNotMetException;
 import ru.practicum.ewm.exception.DuplicatedDataException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidationException;
+import ru.practicum.ewm.validation.FutureAfterHours;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 @Slf4j
@@ -37,27 +42,10 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        log.error("Bad Request", e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
 
-    @ExceptionHandler
+    @ExceptionHandler({MissingRequestHeaderException.class, ConditionsNotMetException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final MissingRequestHeaderException e) {
-        log.error("Bad Request", e);
-        return new ErrorResponse(
-                e.getMessage()
-        );
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleConditionsNotMetException(final ConditionsNotMetException e) {
+    public ErrorResponse handleConditionsNotMetException(final Exception e) {
         log.error("Bad Request", e);
         return new ErrorResponse(
                 e.getMessage()
@@ -87,15 +75,20 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ValidationErrorResponse onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+    ResponseEntity<ValidationErrorResponse> onMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         ValidationErrorResponse error = new ValidationErrorResponse("Ошибка валидации MethodArgument");
+        List<Violation> violations = new ArrayList<>();
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
-            error.getViolations().add(
-                    new Violation(fieldError.getField(), fieldError.getDefaultMessage())
-            );
+            Violation violation = new Violation(fieldError.getField(), fieldError.getDefaultMessage());
+            // Для ошибки проверки даты начала кидаем другой код ошибки
+            if (fieldError.getCode() != null && fieldError.getCode().equals(FutureAfterHours.class.getSimpleName())) {
+                error.getViolations().add(violation);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+            }
+            violations.add(violation);
         }
+        error.getViolations().addAll(violations);
         log.error("Validation errors {} ", error, e);
-        return error;
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 }

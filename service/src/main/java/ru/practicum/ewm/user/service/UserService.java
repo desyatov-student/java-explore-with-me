@@ -9,7 +9,7 @@ import ru.practicum.ewm.exception.DuplicatedDataException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.user.dto.GetUsersRequest;
 import ru.practicum.ewm.user.dto.NewUserDto;
-import ru.practicum.ewm.user.dto.UserDto;
+import ru.practicum.ewm.user.dto.UserFullDto;
 import ru.practicum.ewm.user.mapper.UserMapper;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.repository.UserRepository;
@@ -25,7 +25,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public List<UserDto> getUsers(GetUsersRequest request) {
+    public List<UserFullDto> getUsers(GetUsersRequest request) {
         List<Long> ids = request.getIds();
         Integer from = request.getFrom();
         Integer size = request.getSize();
@@ -51,7 +51,7 @@ public class UserService {
                 });
     }
 
-    public UserDto create(NewUserDto request) {
+    public UserFullDto create(NewUserDto request) {
         Optional<User> alreadyExistUser = userRepository.findByEmail(request.getEmail());
         if (alreadyExistUser.isPresent()) {
             log.error("Creating user is failed. email = {} exists", request.getEmail());

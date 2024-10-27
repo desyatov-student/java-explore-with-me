@@ -23,11 +23,12 @@ public class StatsService {
 
     private final HitRepository hitRepository;
     private final EndpointHitMapper endpointHitMapper;
+    private final DateMapper dateMapper;
 
     @Transactional
     public EndpointHitDto create(NewEndpointHitRequestDto request) {
         EndpointHit hit = endpointHitMapper.toHit(request);
-        hit.setTimestamp(DateMapper.now());
+        hit.setTimestamp(dateMapper.now());
         hit = hitRepository.save(hit);
         return endpointHitMapper.toDto(hit);
     }

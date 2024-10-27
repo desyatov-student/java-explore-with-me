@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateCategoryDto {
+public class UpdateCategoryRequest {
     @NotBlank
     private String name;
 }

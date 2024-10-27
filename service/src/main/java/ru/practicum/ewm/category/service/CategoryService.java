@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewm.category.dto.UpdateCategoryDto;
+import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
@@ -34,7 +34,7 @@ public class CategoryService {
         return mapper.toDto(getCategoryById(categoryId));
     }
 
-    private Category getCategoryById(Long categoryId) {
+    public Category getCategoryById(Long categoryId) {
         return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> {
                     String errorMessage = String.format("Category not found with id = %d", categoryId);
@@ -63,7 +63,7 @@ public class CategoryService {
     }
 
     @Transactional
-    public CategoryDto update(Long categoryId, UpdateCategoryDto request) {
+    public CategoryDto update(Long categoryId, UpdateCategoryRequest request) {
         Category category = getCategoryById(categoryId);
         if (category.getName().equals(request.getName())) {
             throwDuplicatedDataException(request.getName());

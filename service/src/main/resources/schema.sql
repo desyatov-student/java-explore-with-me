@@ -10,3 +10,30 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(40) NOT NULL,
     UNIQUE(name)
 );
+
+CREATE TABLE IF NOT EXISTS events (
+   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+   initiator_id BIGINT REFERENCES users (id) ON DELETE CASCADE,
+   category_id BIGINT REFERENCES categories (id),
+   request_id BIGINT REFERENCES requests (id),
+   annotation VARCHAR NOT NULL,
+   title VARCHAR NOT NULL,
+   description VARCHAR NOT NULL,
+   created_on TIMESTAMP,
+   event_date TIMESTAMP,
+   published_on TIMESTAMP,
+   latitude FLOAT NOT NULL,
+   longitude FLOAT NOT NULL,
+   paid BOOLEAN NOT NULL,
+   participant_limit INT,
+   request_moderation BOOLEAN,
+   state VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS requests (
+   id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
+   requester_id BIGINT REFERENCES users (id) ON DELETE CASCADE,
+   event_id BIGINT REFERENCES events (id) ON DELETE CASCADE,
+   created TIMESTAMP NOT NULL,
+   status VARCHAR NOT NULL
+);
