@@ -17,7 +17,6 @@ import ru.practicum.ewm.dto.GetStatsRequest;
 import ru.practicum.ewm.dto.ViewStatsDto;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
-import ru.practicum.ewm.event.dto.EventSort;
 import ru.practicum.ewm.event.dto.GetEventsRequest;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventRequest;
@@ -39,12 +38,14 @@ import ru.practicum.ewm.utils.DateMapper;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static ru.practicum.ewm.event.dto.EventSort.EVENT_DATE;
 
@@ -66,12 +67,12 @@ public class EventService {
 
     public List<EventShortDto> getShortEvents(GetEventsRequest params) {
         List<Event> events = getEvents(params);
-        return enrichedShortEventsWithAdditionalData(events);
+        return enrichedShortEventsWithAdditionalData(events, params.isSortByViews());
     }
 
     public List<EventFullDto> getFullEvents(GetEventsRequest params) {
         List<Event> events = getEvents(params);
-        return enrichedFullEventsWithAdditionalData(events);
+        return enrichedFullEventsWithAdditionalData(events, params.isSortByViews());
     }
 
     private List<Event> getEvents(GetEventsRequest params) {
@@ -145,18 +146,18 @@ public class EventService {
 
     public List<EventShortDto> getEventsByInitiatorId(Long initiatorId) {
         User initiator = getUserById(initiatorId);
-        return enrichedShortEventsWithAdditionalData(eventRepository.findByInitiator(initiator));
+        return enrichedShortEventsWithAdditionalData(eventRepository.findByInitiator(initiator), false);
     }
 
     public EventFullDto getByIdAndInitiatorId(Long eventId, Long initiatorId) {
         Event event = getEventByIdAndInitiatorId(eventId, initiatorId);
-        return enrichedFullEventsWithAdditionalData(List.of(event)).get(0);
+        return enrichedFullEventsWithAdditionalData(List.of(event), false).get(0);
     }
 
     public EventFullDto getByIdAndStates(Long eventId, List<EventState> states) {
         Event event = eventRepository.findByIdAndStateIn(eventId, states)
                 .orElseThrow(() -> throwEventNotFound(eventId, null));
-        return enrichedFullEventsWithAdditionalData(List.of(event)).get(0);
+        return enrichedFullEventsWithAdditionalData(List.of(event), false).get(0);
     }
 
     @Transactional
@@ -194,11 +195,11 @@ public class EventService {
             event.setCategory(category);
         }
         event = eventRepository.save(event);
-        return enrichedFullEventsWithAdditionalData(List.of(event)).get(0);
+        return enrichedFullEventsWithAdditionalData(List.of(event), false).get(0);
     }
 
     // Запрос подтвержденных запросов и просмотров
-    private List<EventShortDto> enrichedShortEventsWithAdditionalData(List<Event> events) {
+    private List<EventShortDto> enrichedShortEventsWithAdditionalData(List<Event> events, boolean sortByViews) {
         if (events.isEmpty()) {
             return List.of();
         }
@@ -206,18 +207,23 @@ public class EventService {
         Map<Long, Long> confirmedRequests = getCountConfirmedRequestByEvents(events, statuses);
         Map<Long, Long> viewsByEvents = getCountViewsByEvents(events);
 
-        return events.stream()
+        Stream<EventShortDto> stream = events.stream()
                 .map(e -> {
                     EventShortDto eventShortDto = mapper.toShortDto(e);
                     eventShortDto.setConfirmedRequests(confirmedRequests.getOrDefault(e.getId(), 0L));
                     eventShortDto.setViews(viewsByEvents.getOrDefault(e.getId(), 0L));
                     return eventShortDto;
-                })
-                .toList();
+                });
+
+        if (sortByViews) {
+            return stream.sorted(Comparator.comparing(EventShortDto::getViews).reversed()).toList();
+        } else {
+            return stream.toList();
+        }
     }
 
     // Запрос подтвержденных запросов и просмотров
-    private List<EventFullDto> enrichedFullEventsWithAdditionalData(List<Event> events) {
+    private List<EventFullDto> enrichedFullEventsWithAdditionalData(List<Event> events, boolean sortByViews) {
         if (events.isEmpty()) {
             return List.of();
         }
@@ -225,14 +231,18 @@ public class EventService {
         Map<Long, Long> confirmedRequests = getCountConfirmedRequestByEvents(events, statuses);
         Map<Long, Long> viewsByEvents = getCountViewsByEvents(events);
 
-        return events.stream()
+        Stream<EventFullDto> stream = events.stream()
                 .map(e -> {
                     EventFullDto eventFullDto = mapper.toFullDto(e);
                     eventFullDto.setConfirmedRequests(confirmedRequests.getOrDefault(e.getId(), 0L));
                     eventFullDto.setViews(viewsByEvents.getOrDefault(e.getId(), 0L));
                     return eventFullDto;
-                })
-                .toList();
+                });
+        if (sortByViews) {
+            return stream.sorted(Comparator.comparing(EventFullDto::getViews).reversed()).toList();
+        } else {
+            return stream.toList();
+        }
     }
 
     private Map<Long, Long> getCountConfirmedRequestByEvents(List<Event> events, List<RequestStatus> statuses) {

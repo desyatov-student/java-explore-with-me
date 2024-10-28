@@ -6,6 +6,8 @@ import ru.practicum.ewm.event.model.EventState;
 
 import java.util.Set;
 
+import static ru.practicum.ewm.event.dto.EventSort.VIEWS;
+
 @Data
 @AllArgsConstructor
 public class GetEventsRequest {
@@ -20,4 +22,8 @@ public class GetEventsRequest {
     private Integer size;
     private Set<EventState> states;
     private Set<Long> users;
+
+    public boolean isSortByViews() {
+        return this.getSort() != null && this.getSort().equals(VIEWS);
+    }
 }
