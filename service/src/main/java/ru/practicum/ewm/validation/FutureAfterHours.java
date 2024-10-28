@@ -13,7 +13,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target({ElementType.FIELD})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = CheckFutureDateValidator.class)
+@Constraint(validatedBy = FutureAfterHoursValidator.class)
 public @interface FutureAfterHours {
     String message() default "Start must be 2 hours later current time";
 

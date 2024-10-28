@@ -11,7 +11,8 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.Location;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.UpdateEventRequest;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.utils.DateMapper;
@@ -50,7 +51,19 @@ public interface EventMapper {
     @Mapping(source = "request.location.lat", target = "latitude")
     @Mapping(source = "request.location.lon", target = "longitude")
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    Event updateModel(@MappingTarget Event event, UpdateEventRequest request);
+    Event updateModel(@MappingTarget Event event, UpdateEventUserRequest request);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdOn", ignore = true)
+    @Mapping(target = "publishedOn", ignore = true)
+    @Mapping(target = "state", ignore = true)
+    @Mapping(target = "initiator", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "requests", ignore = true)
+    @Mapping(source = "request.location.lat", target = "latitude")
+    @Mapping(source = "request.location.lon", target = "longitude")
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    Event updateModel(@MappingTarget Event event, UpdateEventAdminRequest request);
 
     @Named("latitudeToLocation")
     default Location toLocation(Event event) {

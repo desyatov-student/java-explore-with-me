@@ -46,10 +46,10 @@ public class DateMapper {
     }
 
     public Instant now() {
-        return LocalDateTime.now().atZone(ZONE).toInstant();
+        return toInstant(toString(LocalDateTime.now().atZone(ZONE).toInstant()));
     }
 
     public LocalDateTime nowLocalDateTime() {
-        return LocalDateTime.now().atZone(ZONE).toLocalDateTime();
+        return toLocalDateTime(toString(LocalDateTime.now().atZone(ZONE).toInstant()));
     }
 }

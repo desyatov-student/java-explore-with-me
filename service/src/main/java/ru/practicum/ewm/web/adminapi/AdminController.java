@@ -19,6 +19,7 @@ import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
 import ru.practicum.ewm.category.service.CategoryService;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.GetEventsRequest;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.event.model.EventState;
 import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.exception.ValidationException;
@@ -54,7 +55,7 @@ public class AdminController {
 
     @PostMapping("/users")
     @ResponseStatus(HttpStatus.CREATED)
-    public UserFullDto create(@Valid @RequestBody NewUserDto request) {
+    public UserFullDto createUser(@Valid @RequestBody NewUserDto request) {
         return userService.create(request);
     }
 
@@ -68,7 +69,7 @@ public class AdminController {
 
     @PostMapping("/categories")
     @ResponseStatus(HttpStatus.CREATED)
-    public CategoryDto create(@Valid @RequestBody NewCategoryDto request) {
+    public CategoryDto createCategory(@Valid @RequestBody NewCategoryDto request) {
         return categoryService.create(request);
     }
 
@@ -79,7 +80,7 @@ public class AdminController {
     }
 
     @PatchMapping("/categories/{catId}")
-    public CategoryDto update(
+    public CategoryDto updateCategory(
             @PathVariable Long catId,
             @Valid @RequestBody UpdateCategoryRequest request
     ) {
@@ -103,19 +104,17 @@ public class AdminController {
                     .orElseThrow(() -> new ValidationException("Unknown state: " + state))
                 ).collect(Collectors.toSet());
 
-        GetEventsRequest getEventsRequest = new GetEventsRequest(
-                null,
-                categories,
-                null,
-                rangeStart,
-                rangeEnd,
-                null,
-                null,
-                from,
-                size,
-                states,
-                users
+        GetEventsRequest getEventsRequest = new GetEventsRequest(null, categories, null, rangeStart, rangeEnd,
+                null, null, from, size, states, users
         );
         return eventService.getFullEvents(getEventsRequest);
+    }
+
+    @PatchMapping("/events/{eventId}")
+    public EventFullDto updateEvent(
+            @PathVariable Long eventId,
+            @Valid @RequestBody UpdateEventAdminRequest request
+    ) {
+        return eventService.updateEventById(eventId, request);
     }
 }

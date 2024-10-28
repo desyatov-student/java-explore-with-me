@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.UpdateEventRequest;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.service.EventService;
 
 import java.util.List;
@@ -53,7 +53,7 @@ public class PrivateController {
     public EventFullDto updateEventByIdAndInitiatorId(
             @PathVariable Long eventId,
             @PathVariable Long userId,
-            @Valid @RequestBody UpdateEventRequest request
+            @Valid @RequestBody UpdateEventUserRequest request
     ) {
         return eventService.updateEventByIdAndInitiatorId(eventId, userId, request);
     }

@@ -20,6 +20,7 @@ import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.exception.ValidationException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
@@ -54,8 +55,9 @@ public class PublicController {
             @RequestParam(defaultValue = "10") Integer size,
             HttpServletRequest request
     ) {
-        EventSort sort = EventSort.from(sortParam)
-                .orElseThrow(() -> new ValidationException("Unknown sort: " + sortParam));
+        EventSort sort = Optional.ofNullable(sortParam).map(s -> EventSort.from(s)
+                .orElseThrow(() -> new ValidationException("Unknown sort: " + s))).orElse(null);
+
         GetEventsRequest getEventsRequest = new GetEventsRequest(
                 text,
                 categories,

@@ -19,7 +19,8 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.GetEventsRequest;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.UpdateEventRequest;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
+import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.model.EventState;
@@ -92,7 +93,7 @@ public class EventService {
         }
 
         if (!params.getUsers().isEmpty()) {
-            predicate = predicate.and(QEvent.event.initiator.id.in(params.getCategories()));
+            predicate = predicate.and(QEvent.event.initiator.id.in(params.getUsers()));
         }
 
         if (params.getText() != null && !params.getText().isBlank()) {
@@ -176,7 +177,7 @@ public class EventService {
     }
 
     @Transactional
-    public EventFullDto updateEventByIdAndInitiatorId(Long eventId, Long initiatorId, UpdateEventRequest request) {
+    public EventFullDto updateEventByIdAndInitiatorId(Long eventId, Long initiatorId, UpdateEventUserRequest request) {
         Event event = getEventByIdAndInitiatorId(eventId, initiatorId);
         List<EventState> allowedStates = List.of(EventState.PENDING, EventState.CANCELED);
         if (allowedStates.stream().noneMatch(event.getState()::equals)) {
@@ -189,6 +190,39 @@ public class EventService {
             case SEND_TO_REVIEW -> EventState.PENDING;
             case CANCEL_REVIEW -> EventState.CANCELED;
         };
+        event.setState(newState);
+        if (request.getCategory() != null) {
+            Category category = getCategoryById(request.getCategory());
+            event.setCategory(category);
+        }
+        event = eventRepository.save(event);
+        return enrichedFullEventsWithAdditionalData(List.of(event), false).get(0);
+    }
+
+    @Transactional
+    public EventFullDto updateEventById(Long eventId, UpdateEventAdminRequest request) {
+        Event event = getEventById(eventId);
+        EventState newState = null;
+        switch (request.getStateAction()) {
+            case PUBLISH_EVENT -> {
+                if (!event.getState().equals(EventState.PENDING)) {
+                    String errorMessage = "Cannot publish the event because it's not in the right state: PUBLISHED, current: " + event.getState();
+                    log.error(errorMessage);
+                    throw new ForbiddenException(errorMessage);
+                }
+                newState = EventState.PUBLISHED;
+            }
+            case REJECT_EVENT -> {
+                if (event.getState().equals(EventState.PUBLISHED)) {
+                    String errorMessage = "Cannot publish the event because it's not in the right state: CANCELED, PENDING, current: " + event.getState();
+                    log.error(errorMessage);
+                    throw new ForbiddenException(errorMessage);
+                }
+                newState = EventState.CANCELED;
+            }
+        }
+
+        event = mapper.updateModel(event, request);
         event.setState(newState);
         if (request.getCategory() != null) {
             Category category = getCategoryById(request.getCategory());
@@ -280,6 +314,11 @@ public class EventService {
         User initiator = getUserById(initiatorId);
         return eventRepository.findByIdAndInitiator(eventId, initiator)
                 .orElseThrow(() -> throwEventNotFound(eventId, initiatorId));
+    }
+
+    private Event getEventById(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> throwEventNotFound(eventId, null));
     }
 
     private NotFoundException throwEventNotFound(Long eventId, Long initiatorId) {

@@ -2,15 +2,17 @@ package ru.practicum.ewm.category.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.ewm.category.dto.CategoryDto;
+import ru.practicum.ewm.category.dto.NewCategoryDto;
 import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
+import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.repository.CategoryRepository;
-import ru.practicum.ewm.category.dto.NewCategoryDto;
-import ru.practicum.ewm.category.dto.CategoryDto;
-import ru.practicum.ewm.category.mapper.CategoryMapper;
 import ru.practicum.ewm.exception.DuplicatedDataException;
+import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.NotFoundException;
 
 import java.util.List;
@@ -59,15 +61,23 @@ public class CategoryService {
     @Transactional
     public void removeCategory(Long categoryId) {
         Category category = getCategoryById(categoryId);
-        categoryRepository.deleteById(category.getId());
+        try {
+            categoryRepository.deleteById(category.getId());
+            categoryRepository.flush();
+        } catch (DataIntegrityViolationException e) { // PSQLException , DataIntegrityViolationException
+            String message = "Could not remove category.";
+            log.error(message);
+            throw new ForbiddenException(message);
+        }
     }
 
     @Transactional
     public CategoryDto update(Long categoryId, UpdateCategoryRequest request) {
-        Category category = getCategoryById(categoryId);
-        if (category.getName().equals(request.getName())) {
+        Optional<Category> alreadyExistCategory = categoryRepository.findByName(request.getName());
+        if (alreadyExistCategory.isPresent()) {
             throwDuplicatedDataException(request.getName());
         }
+        Category category = getCategoryById(categoryId);
         category = mapper.updateModel(category, request);
         category = categoryRepository.save(category);
         return mapper.toDto(category);

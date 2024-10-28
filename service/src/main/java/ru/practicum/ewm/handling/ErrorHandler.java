@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.ewm.exception.ConditionsNotMetException;
 import ru.practicum.ewm.exception.DuplicatedDataException;
+import ru.practicum.ewm.exception.ForbiddenException;
 import ru.practicum.ewm.exception.NotFoundException;
 import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.validation.FutureAfterHours;
@@ -34,14 +35,13 @@ public class ErrorHandler {
         );
     }
 
-    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
-    public ErrorResponse handleDuplicatedData(final DuplicatedDataException e) {
+    @ExceptionHandler({ForbiddenException.class, DuplicatedDataException.class})
+    public ErrorResponse handleDuplicatedData(final Exception e) {
         return new ErrorResponse(
                 e.getMessage()
         );
     }
-
 
     @ExceptionHandler({MissingRequestHeaderException.class, ConditionsNotMetException.class, ValidationException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -80,10 +80,10 @@ public class ErrorHandler {
         List<Violation> violations = new ArrayList<>();
         for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
             Violation violation = new Violation(fieldError.getField(), fieldError.getDefaultMessage());
-            // Для ошибки проверки даты начала кидаем другой код ошибки
+            // Для ошибки проверки даты начала. В ТЗ говорится про 409. в тестах 400. Можно поменять тут
             if (fieldError.getCode() != null && fieldError.getCode().equals(FutureAfterHours.class.getSimpleName())) {
                 error.getViolations().add(violation);
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
             }
             violations.add(violation);
         }

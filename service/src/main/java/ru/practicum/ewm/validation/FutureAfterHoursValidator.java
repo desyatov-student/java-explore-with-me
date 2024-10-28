@@ -6,7 +6,7 @@ import ru.practicum.ewm.utils.DateMapper;
 
 import java.time.LocalDateTime;
 
-public class CheckFutureDateValidator implements ConstraintValidator<FutureAfterHours, String> {
+public class FutureAfterHoursValidator implements ConstraintValidator<FutureAfterHours, String> {
 
     private int hours;
 
