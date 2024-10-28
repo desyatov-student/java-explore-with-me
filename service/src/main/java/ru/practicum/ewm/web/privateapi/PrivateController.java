@@ -8,10 +8,12 @@ import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.GetEventsByInitiatorRequest;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.service.EventService;
@@ -28,8 +30,12 @@ public class PrivateController {
     // Private: События
 
     @GetMapping("/users/{userId}/events")
-    public List<EventShortDto> getEvents(@PathVariable Long userId) {
-        return eventService.getEventsByInitiatorId(userId);
+    public List<EventShortDto> getEvents(
+            @PathVariable Long userId,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return eventService.getEventsByInitiatorId(new GetEventsByInitiatorRequest(userId, from, size));
     }
 
     @GetMapping("/users/{userId}/events/{eventId}")

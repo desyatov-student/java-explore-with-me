@@ -8,6 +8,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.model.Category;
@@ -17,6 +18,7 @@ import ru.practicum.ewm.dto.GetStatsRequest;
 import ru.practicum.ewm.dto.ViewStatsDto;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
+import ru.practicum.ewm.event.dto.GetEventsByInitiatorRequest;
 import ru.practicum.ewm.event.dto.GetEventsRequest;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
@@ -145,9 +147,12 @@ public class EventService {
         return query.fetch();
     }
 
-    public List<EventShortDto> getEventsByInitiatorId(Long initiatorId) {
-        User initiator = getUserById(initiatorId);
-        return enrichedShortEventsWithAdditionalData(eventRepository.findByInitiator(initiator), false);
+    public List<EventShortDto> getEventsByInitiatorId(GetEventsByInitiatorRequest request) {
+        User initiator = getUserById(request.getInitiatorId());
+        Integer from = request.getFrom();
+        Integer size = request.getSize();
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        return enrichedShortEventsWithAdditionalData(eventRepository.findByInitiator(initiator, page), false);
     }
 
     public EventFullDto getByIdAndInitiatorId(Long eventId, Long initiatorId) {
@@ -186,11 +191,15 @@ public class EventService {
             throw new ForbiddenException(errorMessage);
         }
         event = mapper.updateModel(event, request);
-        EventState newState = switch (request.getStateAction()) {
-            case SEND_TO_REVIEW -> EventState.PENDING;
-            case CANCEL_REVIEW -> EventState.CANCELED;
-        };
-        event.setState(newState);
+
+        if (request.getStateAction() != null) {
+            EventState newState = switch (request.getStateAction()) {
+                case SEND_TO_REVIEW -> EventState.PENDING;
+                case CANCEL_REVIEW -> EventState.CANCELED;
+            };
+            event.setState(newState);
+        }
+
         if (request.getCategory() != null) {
             Category category = getCategoryById(request.getCategory());
             event.setCategory(category);
@@ -202,28 +211,31 @@ public class EventService {
     @Transactional
     public EventFullDto updateEventById(Long eventId, UpdateEventAdminRequest request) {
         Event event = getEventById(eventId);
-        EventState newState = null;
-        switch (request.getStateAction()) {
-            case PUBLISH_EVENT -> {
-                if (!event.getState().equals(EventState.PENDING)) {
-                    String errorMessage = "Cannot publish the event because it's not in the right state: PUBLISHED, current: " + event.getState();
-                    log.error(errorMessage);
-                    throw new ForbiddenException(errorMessage);
+        event = mapper.updateModel(event, request);
+
+        if (request.getStateAction() != null) {
+            EventState newState = null;
+            switch (request.getStateAction()) {
+                case PUBLISH_EVENT -> {
+                    if (!event.getState().equals(EventState.PENDING)) {
+                        String errorMessage = "Cannot publish the event because it's not in the right state: PUBLISHED, current: " + event.getState();
+                        log.error(errorMessage);
+                        throw new ForbiddenException(errorMessage);
+                    }
+                    newState = EventState.PUBLISHED;
                 }
-                newState = EventState.PUBLISHED;
-            }
-            case REJECT_EVENT -> {
-                if (event.getState().equals(EventState.PUBLISHED)) {
-                    String errorMessage = "Cannot publish the event because it's not in the right state: CANCELED, PENDING, current: " + event.getState();
-                    log.error(errorMessage);
-                    throw new ForbiddenException(errorMessage);
+                case REJECT_EVENT -> {
+                    if (event.getState().equals(EventState.PUBLISHED)) {
+                        String errorMessage = "Cannot publish the event because it's not in the right state: CANCELED, PENDING, current: " + event.getState();
+                        log.error(errorMessage);
+                        throw new ForbiddenException(errorMessage);
+                    }
+                    newState = EventState.CANCELED;
                 }
-                newState = EventState.CANCELED;
             }
+            event.setState(newState);
         }
 
-        event = mapper.updateModel(event, request);
-        event.setState(newState);
         if (request.getCategory() != null) {
             Category category = getCategoryById(request.getCategory());
             event.setCategory(category);
