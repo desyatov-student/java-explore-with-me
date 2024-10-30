@@ -292,7 +292,7 @@ public class EventService {
     }
 
     private Map<Long, Long> getCountConfirmedRequestByEvents(List<Event> events, List<RequestStatus> statuses) {
-        return requestRepository.countConfirmedRequestByEvents(events, statuses).stream()
+        return requestRepository.countRequestByEventsAndStatuses(events, statuses).stream()
                 .collect(Collectors.toMap(RequestCount::getEventId, RequestCount::getConfirmedRequests));
     }
 
@@ -328,7 +328,7 @@ public class EventService {
                 .orElseThrow(() -> throwEventNotFound(eventId, initiatorId));
     }
 
-    private Event getEventById(Long eventId) {
+    public Event getEventById(Long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> throwEventNotFound(eventId, null));
     }

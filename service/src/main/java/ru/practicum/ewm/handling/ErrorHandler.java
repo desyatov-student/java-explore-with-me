@@ -11,6 +11,7 @@ import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import ru.practicum.ewm.exception.ConditionsNotMetException;
 import ru.practicum.ewm.exception.DuplicatedDataException;
@@ -83,12 +84,30 @@ public class ErrorHandler {
             // Для ошибки проверки даты начала. В ТЗ говорится про 409. в тестах 400. Можно поменять тут
             if (fieldError.getCode() != null && fieldError.getCode().equals(FutureAfterHours.class.getSimpleName())) {
                 error.getViolations().add(violation);
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
             }
             violations.add(violation);
         }
         error.getViolations().addAll(violations);
         log.error("Validation errors {} ", error, e);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    @ExceptionHandler
+    ResponseEntity<ValidationErrorResponse> onHandlerMethodValidationException(HandlerMethodValidationException e) {
+        ValidationErrorResponse error = new ValidationErrorResponse("Ошибка валидации MethodArgument");
+        List<Violation> violations = new ArrayList<>();
+    //    for (FieldError fieldError : e.getBindingResult().getFieldErrors()) {
+    //        Violation violation = new Violation(fieldError.getField(), fieldError.getDefaultMessage());
+    //        // Для ошибки проверки даты начала. В ТЗ говорится про 409. в тестах 400. Можно поменять тут
+    //        if (fieldError.getCode() != null && fieldError.getCode().equals(FutureAfterHours.class.getSimpleName())) {
+    //            error.getViolations().add(violation);
+    //            return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
+    //        }
+    //        violations.add(violation);
+    //    }
+        error.getViolations().addAll(violations);
+        log.error("Validation errors {} ", error, e);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(error);
     }
 }

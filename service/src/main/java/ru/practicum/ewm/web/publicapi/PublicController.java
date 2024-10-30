@@ -38,9 +38,11 @@ public class PublicController {
     }
 
     @GetMapping("/categories/{catId}")
-    public CategoryDto getById(@PathVariable Long catId) {
+    public CategoryDto getCategoryById(@PathVariable Long catId) {
         return categoryService.getById(catId);
     }
+
+    // События
 
     @GetMapping("/events")
     public List<EventShortDto> getEvents(

@@ -35,5 +35,6 @@ CREATE TABLE IF NOT EXISTS requests (
    requester_id BIGINT REFERENCES users (id) ON DELETE CASCADE,
    event_id BIGINT REFERENCES events (id) ON DELETE CASCADE,
    created TIMESTAMP NOT NULL,
-   status VARCHAR NOT NULL
+   status VARCHAR NOT NULL,
+   UNIQUE(requester_id, event_id)
 );
