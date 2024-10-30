@@ -1,6 +1,7 @@
 package ru.practicum.ewm.web.publicapi;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,8 +9,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import ru.practicum.ewm.category.dto.CategoryDto;
+import ru.practicum.ewm.category.dto.GetCategoriesRequest;
 import ru.practicum.ewm.category.service.CategoryService;
 import ru.practicum.ewm.client.StatsClient;
+import ru.practicum.ewm.compilation.dto.CompilationDto;
+import ru.practicum.ewm.compilation.dto.GetCompilationsRequest;
+import ru.practicum.ewm.compilation.service.CompilationService;
 import ru.practicum.ewm.dto.NewEndpointHitRequestDto;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
@@ -28,13 +33,20 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class PublicController {
 
+    private static final String APP_NAME = "ewm-main-service";
+
     private final CategoryService categoryService;
     private final EventService eventService;
     private final StatsClient statsClient;
+    private final CompilationService compilationService;
 
     @GetMapping("/categories")
-    public List<CategoryDto> getCategories() {
-        return categoryService.getCategories();
+    public List<CategoryDto> getCategories(
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        GetCategoriesRequest request = new GetCategoriesRequest(from, size);
+        return categoryService.getCategories(request);
     }
 
     @GetMapping("/categories/{catId}")
@@ -89,7 +101,7 @@ public class PublicController {
     private void sendStats(HttpServletRequest request) {
         try {
             NewEndpointHitRequestDto newEndpointHit = new NewEndpointHitRequestDto(
-                    "ewm-main-service",
+                    APP_NAME,
                     request.getRequestURI(),
                     request.getRemoteAddr()
             );
@@ -97,5 +109,22 @@ public class PublicController {
         } catch (Exception e) {
             log.error("Send stats error", e);
         }
+    }
+
+    // Подборки
+
+    @GetMapping("/compilations")
+    public List<CompilationDto> getCompilations(
+            @RequestParam(defaultValue = "false") Boolean pinned,
+            @RequestParam(defaultValue = "0") Integer from,
+            @RequestParam(defaultValue = "10") Integer size
+    ) {
+        GetCompilationsRequest getEventsRequest = new GetCompilationsRequest(pinned, from, size);
+        return compilationService.getCompilations(getEventsRequest);
+    }
+
+    @GetMapping("/compilations/{compId}")
+    public CompilationDto getCompilationById(@PathVariable @Positive Long compId) {
+        return compilationService.getById(compId);
     }
 }

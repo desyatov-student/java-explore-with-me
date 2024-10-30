@@ -64,7 +64,7 @@ public class RequestService {
         }
 
         Integer confirmedRequests = requestRepository.countByEventAndStatus(event, RequestStatus.CONFIRMED);
-        if (confirmedRequests >= event.getParticipantLimit()) {
+        if (event.getParticipantLimit() > 0 && confirmedRequests >= event.getParticipantLimit()) {
             throwParticipantLimitException(confirmedRequests, event.getParticipantLimit());
         }
 
@@ -72,7 +72,7 @@ public class RequestService {
         request.setCreated(dateMapper.now());
         request.setRequester(user);
         request.setEvent(event);
-        if (!event.getRequestModeration()) {
+        if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             request.setStatus(RequestStatus.CONFIRMED);
         }
 
@@ -100,6 +100,7 @@ public class RequestService {
         return requestRepository.findByEvent(event).stream().map(mapper::toDto).toList();
     }
 
+    @Transactional
     public EventRequestStatusUpdateResult updateRequestsStatus(Long userId, Long eventId, EventRequestStatusUpdateRequest updateRequest) {
         EventRequestStatus newStatus = EventRequestStatus.from(updateRequest.getStatus())
                 .orElseThrow(() -> new ValidationException("Unknown status: " + updateRequest.getStatus()));

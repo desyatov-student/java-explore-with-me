@@ -3,9 +3,11 @@ package ru.practicum.ewm.category.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.dto.CategoryDto;
+import ru.practicum.ewm.category.dto.GetCategoriesRequest;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
 import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
 import ru.practicum.ewm.category.mapper.CategoryMapper;
@@ -26,8 +28,11 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper mapper;
 
-    public List<CategoryDto> getCategories() {
-        return categoryRepository.findAll().stream()
+    public List<CategoryDto> getCategories(GetCategoriesRequest request) {
+        Integer from = request.getFrom();
+        Integer size = request.getSize();
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        return categoryRepository.findAll(page).stream()
                 .map(mapper::toDto)
                 .toList();
     }
@@ -64,7 +69,8 @@ public class CategoryService {
         try {
             categoryRepository.deleteById(category.getId());
             categoryRepository.flush();
-        } catch (DataIntegrityViolationException e) { // PSQLException , DataIntegrityViolationException
+        // Ошибка если категория уже используется
+        } catch (DataIntegrityViolationException e) {
             String message = "Could not remove category.";
             log.error(message);
             throw new ForbiddenException(message);
@@ -75,6 +81,9 @@ public class CategoryService {
     public CategoryDto update(Long categoryId, UpdateCategoryRequest request) {
         Optional<Category> alreadyExistCategory = categoryRepository.findByName(request.getName());
         if (alreadyExistCategory.isPresent()) {
+            if (alreadyExistCategory.get().getId().equals(categoryId) && alreadyExistCategory.get().getName().equals(request.getName())) {
+                return mapper.toDto(alreadyExistCategory.get());
+            }
             throwDuplicatedDataException(request.getName());
         }
         Category category = getCategoryById(categoryId);

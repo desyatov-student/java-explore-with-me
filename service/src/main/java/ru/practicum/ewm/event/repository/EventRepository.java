@@ -1,5 +1,6 @@
 package ru.practicum.ewm.event.repository;
 
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -13,6 +14,8 @@ import java.util.Optional;
 public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
 
     List<Event> findByInitiator(User initiator, PageRequest page);
+
+    List<Event> findByIdIn(OrderedHashSet<Long> eventIds);
 
     Optional<Event> findByIdAndInitiator(Long eventId, User initiator);
 
