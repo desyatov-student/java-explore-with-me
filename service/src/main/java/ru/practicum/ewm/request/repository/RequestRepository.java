@@ -1,13 +1,12 @@
 package ru.practicum.ewm.request.repository;
 
 import org.antlr.v4.runtime.misc.OrderedHashSet;
-import org.hibernate.type.OrderedSetType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.ewm.event.model.Event;
-import ru.practicum.ewm.request.model.Request;
 import ru.practicum.ewm.request.dto.RequestCount;
+import ru.practicum.ewm.request.model.Request;
 import ru.practicum.ewm.request.model.RequestStatus;
 import ru.practicum.ewm.user.model.User;
 
