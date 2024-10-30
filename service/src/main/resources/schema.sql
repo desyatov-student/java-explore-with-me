@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS events (
    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY NOT NULL,
    initiator_id BIGINT REFERENCES users (id) ON DELETE CASCADE,
    category_id BIGINT REFERENCES categories (id),
-   request_id BIGINT REFERENCES requests (id),
+   request_id BIGINT,
    annotation VARCHAR NOT NULL,
    title VARCHAR NOT NULL,
    description VARCHAR NOT NULL,
@@ -38,3 +38,6 @@ CREATE TABLE IF NOT EXISTS requests (
    status VARCHAR NOT NULL,
    UNIQUE(requester_id, event_id)
 );
+
+ALTER TABLE events DROP CONSTRAINT IF EXISTS fk_events_to_requests;
+ALTER TABLE events ADD CONSTRAINT fk_events_to_requests FOREIGN KEY(request_id) REFERENCES requests(id);
