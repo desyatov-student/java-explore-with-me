@@ -1,2 +1,3 @@
 # java-explore-with-me
-Template repository for ExploreWithMe project.
+
+![filmorate-erd.png](db_diagram/ewm-erd.png)
