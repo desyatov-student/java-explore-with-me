@@ -14,7 +14,7 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
             "from EndpointHit as h " +
             "where 1=1 " +
             "and h.timestamp >= ?1 " +
-            "and h.timestamp < ?2 " +
+            "and h.timestamp <= ?2 " +
             "group by h.app, h.uri " +
             "order by count(h.id) desc")
     List<ViewStats> countHitsByAppAndUri(Instant start, Instant end);
@@ -24,7 +24,7 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
             "where 1=1 " +
             "and h.uri in (?3) " +
             "and h.timestamp >= ?1 " +
-            "and h.timestamp < ?2 " +
+            "and h.timestamp <= ?2 " +
             "group by h.app, h.uri " +
             "order by count(h.id) desc")
     List<ViewStats> countHitsByAppAndUri(Instant start, Instant end, Set<String> uris);
@@ -33,7 +33,7 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
             "from EndpointHit as h " +
             "where 1=1 " +
             "and h.timestamp >= ?1 " +
-            "and h.timestamp < ?2 " +
+            "and h.timestamp <= ?2 " +
             "group by h.app, h.uri " +
             "order by count(h.id) desc")
     List<ViewStats> countHitsByAppAndUriAndUniqueIp(Instant start, Instant end);
@@ -43,7 +43,7 @@ public interface HitRepository extends JpaRepository<EndpointHit, Long> {
             "where 1=1 " +
             "and h.uri in (?3) " +
             "and h.timestamp >= ?1 " +
-            "and h.timestamp < ?2 " +
+            "and h.timestamp <= ?2 " +
             "group by h.app, h.uri " +
             "order by count(h.id) desc")
     List<ViewStats> countHitsByAppAndUriAndUniqueIp(Instant start, Instant end, Set<String> uris);

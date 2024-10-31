@@ -41,15 +41,14 @@ public class StatsController {
     public List<ViewStatsDto> getStats(
             @RequestParam String start,
             @RequestParam String end,
-            @RequestParam(required = false) Set<String> uris,
+            @RequestParam(defaultValue = "") Set<String> uris,
             @RequestParam(defaultValue = "false") Boolean unique
 
     ) {
-        Set<String> urisResult = (uris == null) ? Set.of() : uris;
         GetStatsRequest request = new GetStatsRequest(
                 dateMapper.toInstant(start),
                 dateMapper.toInstant(end),
-                urisResult,
+                uris,
                 unique
         );
         return statsService.getStats(request);

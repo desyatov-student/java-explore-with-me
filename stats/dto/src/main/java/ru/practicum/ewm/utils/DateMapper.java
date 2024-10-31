@@ -45,7 +45,11 @@ public class DateMapper {
         return date.atZone(ZONE).toInstant();
     }
 
-    public static Instant now() {
-        return LocalDateTime.now().atZone(ZONE).toInstant();
+    public Instant now() {
+        return toInstant(toString(LocalDateTime.now().atZone(ZONE).toInstant()));
+    }
+
+    public LocalDateTime nowLocalDateTime() {
+        return toLocalDateTime(toString(LocalDateTime.now().atZone(ZONE).toInstant()));
     }
 }
