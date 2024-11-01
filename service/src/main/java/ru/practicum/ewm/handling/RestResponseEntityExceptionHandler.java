@@ -60,7 +60,7 @@ public class RestResponseEntityExceptionHandler extends ResponseEntityExceptionH
             // Обработка валидации даты события
             if (resolvable.getCodes() != null && Arrays.stream(resolvable.getCodes()).toList().contains(FutureAfterHours.class.getSimpleName())) {
                 ApiError apiError = ApiError.conflict(resolvable.getDefaultMessage());
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
             } else {
                 errors.add(resolvable.getDefaultMessage());
             }
