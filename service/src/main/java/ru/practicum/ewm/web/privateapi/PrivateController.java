@@ -13,6 +13,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.GetCommentsRequest;
+import ru.practicum.ewm.comment.dto.NewCommentDto;
+import ru.practicum.ewm.comment.service.CommentService;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.EventShortDto;
 import ru.practicum.ewm.event.dto.GetEventsByInitiatorRequest;
@@ -33,6 +37,7 @@ public class PrivateController {
 
     private final EventService eventService;
     private final RequestService requestService;
+    private final CommentService commentService;
 
     // Private: События
 
@@ -110,5 +115,26 @@ public class PrivateController {
     @GetMapping("/users/{userId}/requests")
     public List<RequestDto> getRequests(@PathVariable @Positive Long userId) {
         return requestService.getRequestsInOtherEventsByUserId(userId);
+    }
+
+    // Комментарии
+
+    @GetMapping("/users/{userId}/comments")
+    public List<CommentDto> getAuthorComments(
+            @PathVariable @Positive Long userId,
+            @Min(value = 0) @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return commentService.getAuthorComments(userId, new GetCommentsRequest(from, size));
+    }
+
+    @PostMapping("/users/{userId}/comments")
+    @ResponseStatus(HttpStatus.CREATED)
+    public CommentDto createComment(
+            @PathVariable @Positive Long userId,
+            @RequestParam @Positive Long eventId,
+            @Valid @RequestBody NewCommentDto request
+    ) {
+        return commentService.create(userId, eventId, request);
     }
 }

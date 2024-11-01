@@ -17,6 +17,7 @@ import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.dto.NewCategoryDto;
 import ru.practicum.ewm.category.dto.UpdateCategoryRequest;
 import ru.practicum.ewm.category.service.CategoryService;
+import ru.practicum.ewm.comment.service.CommentService;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
 import ru.practicum.ewm.compilation.dto.NewCompilationDto;
 import ru.practicum.ewm.compilation.dto.UpdateCompilationRequest;
@@ -45,6 +46,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final EventService eventService;
     private final CompilationService compilationService;
+    private final CommentService commentService;
 
     // Пользователи
 
@@ -142,5 +144,15 @@ public class AdminController {
             @Valid @RequestBody UpdateCompilationRequest request
     ) {
         return compilationService.update(compId, request);
+    }
+
+    // Комментарии
+
+    @DeleteMapping("/admin/comments/{commentId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void removeComment(
+            @PathVariable @Positive Long commentId
+    ) {
+        commentService.remove(commentId);
     }
 }
