@@ -136,11 +136,11 @@ public class PublicController {
     // Комментарии
 
     @GetMapping("/comments")
-    public List<CommentDto> getEventComments(
+    public List<CommentDto> getCommentsByEvent(
             @RequestParam @Positive Long eventId,
             @Min(value = 0) @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "10") Integer size
     ) {
-        return commentService.getEventComments(eventId,  new GetCommentsRequest(from, size));
+        return commentService.getCommentsByEvent(eventId,  new GetCommentsRequest(from, size));
     }
 }

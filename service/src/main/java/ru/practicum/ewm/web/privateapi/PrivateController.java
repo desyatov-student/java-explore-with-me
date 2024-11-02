@@ -120,12 +120,12 @@ public class PrivateController {
     // Комментарии
 
     @GetMapping("/users/{userId}/comments")
-    public List<CommentDto> getAuthorComments(
+    public List<CommentDto> getCommentsByAuthor(
             @PathVariable @Positive Long userId,
             @Min(value = 0) @RequestParam(defaultValue = "0") Integer from,
             @Positive @RequestParam(defaultValue = "10") Integer size
     ) {
-        return commentService.getAuthorComments(userId, new GetCommentsRequest(from, size));
+        return commentService.getCommentsByAuthor(userId, new GetCommentsRequest(from, size));
     }
 
     @PostMapping("/users/{userId}/comments")
