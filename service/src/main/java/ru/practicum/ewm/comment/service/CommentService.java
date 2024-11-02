@@ -36,7 +36,7 @@ public class CommentService {
     private final CommentMapper mapper;
     private final DateMapper dateMapper;
 
-    public List<CommentDto> getAuthorComments(Long authorId, GetCommentsRequest request) {
+    public List<CommentDto> getCommentsByAuthor(Long authorId, GetCommentsRequest request) {
         User author = getUserById(authorId);
         Integer from = request.getFrom();
         Integer size = request.getSize();
@@ -46,7 +46,7 @@ public class CommentService {
                 .toList();
     }
 
-    public List<CommentDto> getEventComments(Long eventId, GetCommentsRequest request) {
+    public List<CommentDto> getCommentsByEvent(Long eventId, GetCommentsRequest request) {
         Event event = getEventById(eventId);
         Integer from = request.getFrom();
         Integer size = request.getSize();
