@@ -53,6 +53,13 @@ Table events_compilations {
   compilation_id Long
 }
 
+Table comments {
+  id Long [pk]
+  event_id Long
+  author_id Long
+  text varchar
+  created timestamp
+}
 
 Ref: users.id < events.initiator_id
 Ref: categories.id < events.category_id
@@ -62,3 +69,6 @@ Ref: users.id < requests.requester_id
 
 Ref: events_compilations.compilation_id < compilations.id
 Ref: events_compilations.event_id < events.id
+
+Ref: comments.event_id < events.id
+Ref: comments.author_id < users.id

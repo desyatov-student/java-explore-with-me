@@ -1,12 +1,14 @@
 package ru.practicum.ewm.service;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.EndpointHitDto;
 import ru.practicum.ewm.dto.GetStatsRequest;
 import ru.practicum.ewm.dto.NewEndpointHitRequestDto;
 import ru.practicum.ewm.dto.ViewStatsDto;
+import ru.practicum.ewm.exception.ValidationException;
 import ru.practicum.ewm.mapper.EndpointHitMapper;
 import ru.practicum.ewm.model.EndpointHit;
 import ru.practicum.ewm.model.ViewStats;
@@ -16,6 +18,7 @@ import ru.practicum.ewm.utils.DateMapper;
 import java.util.List;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 @Transactional(readOnly = true)
@@ -34,6 +37,11 @@ public class StatsService {
     }
 
     public List<ViewStatsDto> getStats(GetStatsRequest request) {
+        if (request.getStart().isAfter(request.getEnd())) {
+            String errorMessage = String.format("Start date should be before end date, start=%s, end=%s", request.getStart(), request.getEnd());
+            log.error(errorMessage);
+            throw new ValidationException(errorMessage);
+        }
         Function<GetStatsRequest, List<ViewStats>> countHits;
         if (request.getUnique()) {
             if (request.getUris().isEmpty()) {
