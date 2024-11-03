@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewm.exception.DuplicatedDataException;
 import ru.practicum.ewm.exception.NotFoundException;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
+import static org.springframework.data.domain.Sort.Direction.DESC;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -29,7 +33,8 @@ public class UserService {
         List<Long> ids = request.getIds();
         Integer from = request.getFrom();
         Integer size = request.getSize();
-        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
+        Sort sort = Sort.by(ASC, "id");
+        PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size, sort);
 
         Supplier<Page<User>> getUsers;
         if (request.getIds().isEmpty()) {
