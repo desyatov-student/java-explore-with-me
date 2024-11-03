@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "283db21d-8fb2-4766-a9cc-98ad2a2fe595",
+		"_postman_id": "f1cdfe68-c216-45de-87fd-7100c92eb88e",
 		"name": "Test Explore With Me - Feature comments",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "833142"
@@ -326,6 +326,15 @@
 								"value": "application/json"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{baseUrl}}/users/:userId/comments?eventId=0",
 							"host": [
@@ -434,6 +443,15 @@
 								"value": "application/json"
 							}
 						],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
 						"url": {
 							"raw": "{{baseUrl}}/users/:userId/comments?eventId=0",
 							"host": [
@@ -868,8 +886,8 @@
 									"\r",
 									"pm.test(\"Данные в ответе должны соответствовать данным в запросе\", function () {\r",
 									"    let source = pm.collectionVariables.get('comments');\r",
-									"    let response = target.sort();\r",
-									"    let comments = source.sort();\r",
+									"    let response = target;\r",
+									"    let comments = source;\r",
 									"    pm.expect(response).to.eql(comments);\r",
 									"});"
 								],
@@ -1086,6 +1104,7 @@
 					"        };",
 					"    }",
 					"",
+					"",
 					"    getFutureDateTime(hourShift = 5, minuteShift=0, yearShift=0) {",
 					"        let moment = require('moment');",
 					"",
@@ -1224,8 +1243,7 @@
 		},
 		{
 			"key": "commentId",
-			"value": "",
-			"type": "default"
+			"value": ""
 		},
 		{
 			"key": "eventId",
@@ -1237,10 +1255,6 @@
 		},
 		{
 			"key": "commentCount",
-			"value": ""
-		},
-		{
-			"key": "userId",
 			"value": ""
 		}
 	]
