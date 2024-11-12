@@ -1,6 +1,7 @@
 package ru.practicum.ewm.web.publicapi;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +13,9 @@ import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.dto.GetCategoriesRequest;
 import ru.practicum.ewm.category.service.CategoryService;
 import ru.practicum.ewm.client.StatsClient;
+import ru.practicum.ewm.comment.dto.CommentDto;
+import ru.practicum.ewm.comment.dto.GetCommentsRequest;
+import ru.practicum.ewm.comment.service.CommentService;
 import ru.practicum.ewm.compilation.dto.CompilationDto;
 import ru.practicum.ewm.compilation.dto.GetCompilationsRequest;
 import ru.practicum.ewm.compilation.service.CompilationService;
@@ -39,6 +43,7 @@ public class PublicController {
     private final EventService eventService;
     private final StatsClient statsClient;
     private final CompilationService compilationService;
+    private final CommentService commentService;
 
     @GetMapping("/categories")
     public List<CategoryDto> getCategories(
@@ -126,5 +131,16 @@ public class PublicController {
     @GetMapping("/compilations/{compId}")
     public CompilationDto getCompilationById(@PathVariable @Positive Long compId) {
         return compilationService.getById(compId);
+    }
+
+    // Комментарии
+
+    @GetMapping("/comments")
+    public List<CommentDto> getCommentsByEvent(
+            @RequestParam @Positive Long eventId,
+            @Min(value = 0) @RequestParam(defaultValue = "0") Integer from,
+            @Positive @RequestParam(defaultValue = "10") Integer size
+    ) {
+        return commentService.getCommentsByEvent(eventId,  new GetCommentsRequest(from, size));
     }
 }

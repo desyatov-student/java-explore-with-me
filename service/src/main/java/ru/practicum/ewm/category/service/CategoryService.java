@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.dto.CategoryDto;
@@ -20,6 +21,8 @@ import ru.practicum.ewm.exception.NotFoundException;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.data.domain.Sort.Direction.ASC;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -31,6 +34,7 @@ public class CategoryService {
     public List<CategoryDto> getCategories(GetCategoriesRequest request) {
         Integer from = request.getFrom();
         Integer size = request.getSize();
+        Sort sort = Sort.by(ASC, "id");
         PageRequest page = PageRequest.of(from > 0 ? from / size : 0, size);
         return categoryRepository.findAll(page).stream()
                 .map(mapper::toDto)
